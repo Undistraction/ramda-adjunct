@@ -13,11 +13,18 @@ const supportsFantasyLand = () => {
   } catch (e) {
     return false;
   }
+  // Later versions will return a function.
+  // Supporting versions will return `Just(false)`.
   return Just(false).equals(result);
 };
 
 describe('notBoth', function() {
-  const isFantasyLandSupported = supportsFantasyLand();
+  let isFantasyLandSupported;
+
+  before(function() {
+    isFantasyLandSupported = supportsFantasyLand();
+  });
+
 
   it('combines two boolean-returning functions into one', function() {
     const even = x => x % 2 === 0;
@@ -49,17 +56,20 @@ describe('notBoth', function() {
     eq(z.notCalled, true);
   });
 
-  if (isFantasyLandSupported) {
-    it('accepts fantasy-land applicative functors', function() {
-      eq(RA.notBoth(Just(true), Just(true)), Just(false));
-      eq(RA.notBoth(Just(true), Just(false)), Just(true));
-      eq(RA.notBoth(Just(false), Just(true)), Just(true));
-      eq(RA.notBoth(Just(false), Just(false)), Just(true));
-      eq(RA.notBoth(Just(true), Nothing()), Nothing());
-      eq(RA.notBoth(Nothing(), Just(true)), Nothing());
-      eq(RA.notBoth(Nothing(), Just(false)), Nothing());
-      eq(RA.notBoth(Just(false), Nothing()), Nothing());
-      eq(RA.notBoth(Nothing(), Nothing()), Nothing());
-    });
-  }
+  it('accepts fantasy-land applicative functors', function() {
+    console.log(`FA Supported ${isFantasyLandSupported}`);
+    if (!isFantasyLandSupported) {
+      this.skip();
+    }
+
+    eq(RA.notBoth(Just(true), Just(true)), Just(false));
+    eq(RA.notBoth(Just(true), Just(false)), Just(true));
+    eq(RA.notBoth(Just(false), Just(true)), Just(true));
+    eq(RA.notBoth(Just(false), Just(false)), Just(true));
+    eq(RA.notBoth(Just(true), Nothing()), Nothing());
+    eq(RA.notBoth(Nothing(), Just(true)), Nothing());
+    eq(RA.notBoth(Nothing(), Just(false)), Nothing());
+    eq(RA.notBoth(Just(false), Nothing()), Nothing());
+    eq(RA.notBoth(Nothing(), Nothing()), Nothing());
+  });
 });
